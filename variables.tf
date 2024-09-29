@@ -8,6 +8,11 @@ variable "github_org" {
   default = "MoophHD"
 }
 
+variable "github_repo" {
+  type    = string
+  default = "rsschool-devops-course-tasks"
+}
+
 variable "role_name" {
   type    = string
   default = "GithubActionsRole-DSS"
