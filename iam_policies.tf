@@ -17,12 +17,12 @@ data "aws_iam_policy_document" "github_assume_role_policy" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github.arn]
+      identifiers = ["arn:aws:iam::${var.github_org}:oidc-provider/token.actions.githubusercontent.com"]
     }
     condition {
       test     = "StringEquals"
       variable = "${aws_iam_openid_connect_provider.github.url}:sub"
-      values   = ["repo:${var.github_org}/*"]
+      values   = ["repo:${var.github_org}/rsschool-devops-course-tasks:ref:refs/heads/main"]
     }
   }
 }
