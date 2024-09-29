@@ -41,6 +41,9 @@ jobs:
 
       - name: Log Job Start
         run: echo Running Teraform Plan
+      
+      - name: List files
+        run: ls -la
 
       - name: Initialize Terraform
         run: terraform init
