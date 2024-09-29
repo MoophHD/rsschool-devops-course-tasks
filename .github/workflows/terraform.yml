@@ -34,10 +34,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@v4
-            with:
-              role-to-assume: arn:aws:iam::058264092396:role/GithubActionsRole-DSS
-              aws-region: us-east-1
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::058264092396:role/GithubActionsRole-DSS
+          aws-region: us-east-1
 
       - name: Log Job Start
         run: echo Running Teraform Plan
