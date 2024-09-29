@@ -1,10 +1,6 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Terraform Plan
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
@@ -13,13 +9,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform-check:
     runs-on: ubuntu-latest
- 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
       - name: Log Job Start
@@ -36,6 +33,11 @@ jobs:
     needs: terraform-check
     steps:
       - uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+              role-to-assume: arn:aws:iam::058264092396:role/GithubActionsRole-DSS
+              aws-region: us-east-1
 
       - name: Log Job Start
         run: echo Running Teraform Plan
@@ -54,6 +56,11 @@ jobs:
     needs: terraform-plan
     steps:
       - uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+              role-to-assume: arn:aws:iam::058264092396:role/GithubActionsRole-DSS
+              aws-region: us-east-1
 
       - name: Log Job Start
         run: echo Running Teraform Apply
@@ -62,7 +69,7 @@ jobs:
         run: terraform init
 
       - name: Executes the actions proposed in a Terraform plan
-        run: terraform apply
+        run: terraform apply -auto-approve
 
       - name: Log Job Completion
         run: echo Completed Teraform Apply
