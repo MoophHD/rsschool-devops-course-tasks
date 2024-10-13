@@ -23,3 +23,15 @@ variable "bucket_name" {
   default = "terraform-state-bucket-dss"
 }
 
+variable "bastion_ip" {
+  type = string
+  # default = null // Replace with an actual IP address like 192.168.1.100/32
+  default = "0.0.0.0/0" // allow from everywhere; security risk
+}
+
+variable "bastion_keypair_name" {
+  type    = string
+  default = "bastion-keypair"
+}
+
+
