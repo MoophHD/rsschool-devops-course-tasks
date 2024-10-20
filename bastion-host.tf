@@ -9,7 +9,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.bastion_ip != null ? [var.bastion_ip] : []
+    cidr_blocks = [var.bastion_ip]
   }
 
   egress {
@@ -28,7 +28,7 @@ resource "aws_security_group" "bastion" {
 resource "aws_instance" "bastion" {
   ami           = "ami-0aa7d40eeae50c9a9" // Amazon Linux 2 AMI in us-east-1; can i define that explicitly?
   instance_type = "t2.micro"
-  key_name      = var.bastion_keypair_name // Replace with your key pair name
+  key_name      = var.bastion_keypair_name
 
   subnet_id                   = aws_subnet.public[0].id
   vpc_security_group_ids      = [aws_security_group.bastion.id]

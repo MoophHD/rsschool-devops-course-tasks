@@ -91,7 +91,7 @@ resource "aws_security_group" "allow_web" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "HTTP from VPC"
+    description = "SSH to VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -99,11 +99,19 @@ resource "aws_security_group" "allow_web" {
   }
 
   ingress {
-    description = "HTTPS from VPC"
+    description = "HTTPS to VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  egress {
+    description = "SSH from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] // Allow to anywhere or limit to specific IP ranges as needed
   }
 
   egress {
@@ -118,32 +126,103 @@ resource "aws_security_group" "allow_web" {
   }
 }
 
+
 // NACLs add an additional layer of security via subnet-level traffic control
+# resource "aws_network_acl" "main" {
+#   vpc_id = aws_vpc.main.id
+
+#   # Ingress SSH (port 22) from anywhere
+#   ingress {
+#     protocol   = "tcp"
+#     rule_no    = 110
+#     action     = "allow"
+#     cidr_block = "0.0.0.0/0" # Open to all IPs
+#     from_port  = 22
+#     to_port    = 22
+#   }
+
+#   # Allow HTTP from anywhere
+#   ingress {
+#     protocol   = "tcp"
+#     rule_no    = 100
+#     action     = "allow"
+#     cidr_block = "0.0.0.0/0"
+#     from_port  = 80
+#     to_port    = 80
+#   }
+
+#   # Allow HTTPS from anywhere
+#   ingress {
+#     protocol   = "tcp"
+#     rule_no    = 105 # Add a unique rule number for HTTPS
+#     action     = "allow"
+#     cidr_block = "0.0.0.0/0"
+#     from_port  = 443
+#     to_port    = 443
+#   }
+
+#   # Egress SSH (port 22) to anywhere
+#   egress {
+#     protocol   = "tcp"
+#     rule_no    = 210 # Make sure this rule number is unique
+#     action     = "allow"
+#     cidr_block = "0.0.0.0/0" # Open to all IPs
+#     from_port  = 22
+#     to_port    = 22
+#   }
+
+#   # Egress HTTP (port 80) to anywhere
+#   egress {
+#     protocol   = "tcp"
+#     rule_no    = 200
+#     action     = "allow"
+#     cidr_block = "0.0.0.0/0"
+#     from_port  = 80
+#     to_port    = 80
+#   }
+
+#   # Egress HTTPS (port 443) to anywhere
+#   egress {
+#     protocol   = "tcp"
+#     rule_no    = 201 # Add a unique rule number for HTTPS egress
+#     action     = "allow"
+#     cidr_block = "0.0.0.0/0"
+#     from_port  = 443
+#     to_port    = 443
+#   }
+
+#   tags = {
+#     Name = "main"
+#   }
+# }
+
+# Temporarily allow all outbound traffic, for some reason my previouse acl
 resource "aws_network_acl" "main" {
   vpc_id = aws_vpc.main.id
 
-  egress {
-    protocol   = "tcp"
-    rule_no    = 200
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 443
-    to_port    = 443
-  }
-
   ingress {
-    protocol   = "tcp"
+    protocol   = "-1"
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = 80
-    to_port    = 80
+    from_port  = 0
+    to_port    = 0
+  }
+
+  egress {
+    protocol   = "-1"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 
   tags = {
-    Name = "main"
+    Name = "allow-all-nacl"
   }
 }
+
 
 // bind ACL with both public subnets
 resource "aws_network_acl_association" "main" {

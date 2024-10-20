@@ -30,8 +30,14 @@ variable "bastion_ip" {
 }
 
 variable "bastion_keypair_name" {
+  type = string
+  # default = "bastion-keypair"
+  default = "bruhkeyname"
+}
+
+variable "k3s_token" {
   type    = string
-  default = "bastion-keypair"
+  default = "k3s_token"
 }
 
 
