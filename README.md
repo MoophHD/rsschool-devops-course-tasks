@@ -1,6 +1,8 @@
-# AWS VPC Infrastructure and CI/CD Setup
+Here's an updated README that incorporates the new task while maintaining much of the original content:
 
-This project uses Terraform to set up AWS VPC infrastructure and includes CI/CD configuration for automated deployments.
+# AWS VPC Infrastructure and K3s Cluster Setup
+
+This project uses Terraform to set up AWS VPC infrastructure and deploy a K3s Kubernetes cluster.
 
 ## Infrastructure Components
 
@@ -8,7 +10,7 @@ This project uses Terraform to set up AWS VPC infrastructure and includes CI/CD 
 - Internet Gateway and NAT Gateway
 - Security Groups and Network ACLs
 - Bastion host for access to private resources
-- Routing tables for traffic management
+- K3s Kubernetes cluster (1 control plane, 1 worker node)
 
 ## Initial Setup
 
@@ -20,7 +22,7 @@ This project uses Terraform to set up AWS VPC infrastructure and includes CI/CD 
    ```
 2. Update `variables.tf` with your bucket name and region.
 
-## Main Infrastructure Deployment
+## Main Infrastructure and K3s Cluster Deployment
 
 1. Install AWS CLI and Terraform
 2. Clone this repository
@@ -32,32 +34,35 @@ This project uses Terraform to set up AWS VPC infrastructure and includes CI/CD 
    terraform apply
    ```
 
+## K3s Cluster Verification
+
+1. SSH into the bastion host and then into k3s-server
+2. Run `kubectl get nodes` to verify cluster nodes
+3. Deploy a simple workload:
+   ```
+   kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
+   ```
+4. Verify the workload is running:
+   ```
+   kubectl get pods
+   ```
+
 ## Project Structure
 
 - `init/`: Initial setup for Terraform state bucket
 - `bastion-host.tf`: Bastion host configuration
-- `data.tf`: Data sources
-- `github_oidc.tf`: GitHub OIDC configuration
-- `main.tf`: Main configuration
-- `nat.tf`: NAT Gateway setup
-- `policies.tf`: IAM policies
-- `roles.tf`: IAM roles
-- `variables.tf`: Variable definitions
+- `k3s.tf`: K3s cluster configuration
 - `vpc.tf`: VPC and subnet configurations
+- Other configuration files (data.tf, variables.tf, etc.)
 
 ## IAM Role Setup
 
 - **GithubActionsRole**: Provides permissions for GitHub Actions
-  - Permissions: EC2, Route53, S3, IAM, VPC, SQS, EventBridge (Full Access)
-  - Trust Relationship: Configured for GitHub Actions OIDC provider
+- **K3sRole**: Provides necessary permissions for K3s nodes
 
 ## CI/CD with GitHub Actions
 
-The repository includes a workflow with three jobs:
-
-1. `terraform-check`: Runs `terraform fmt`
-2. `terraform-plan`: Executes `terraform plan`
-3. `terraform-apply`: Applies changes (on merge to main)
+The repository includes a workflow for Terraform checks, plan, and apply.
 
 ## Security Considerations
 
@@ -72,3 +77,7 @@ The repository includes a workflow with three jobs:
 - Use `terraform plan` to preview changes
 - Apply changes with `terraform apply`
 - Destroy infrastructure with `terraform destroy` when not needed
+
+## Monitoring
+
+Basic monitoring is implemented using Prometheus and Grafana. Refer to the monitoring documentation for setup and usage details.
