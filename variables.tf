@@ -13,7 +13,7 @@ variable "github_repo" {
   default = "rsschool-devops-course-tasks"
 }
 
-variable "role_name" {
+variable "github_role_name" {
   type    = string
   default = "GithubActionsRole-DSS"
 }

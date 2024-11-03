@@ -2,7 +2,7 @@
 resource "aws_security_group" "bastion" {
   name        = "bastion-sg"
   description = "Security group for bastion host"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "SSH from anywhere"
@@ -30,7 +30,7 @@ resource "aws_instance" "bastion" {
   instance_type = "t2.micro"
   key_name      = var.bastion_keypair_name
 
-  subnet_id                   = aws_subnet.public[0].id
+  subnet_id                   = var.public_subnet_ids[0]
   vpc_security_group_ids      = [aws_security_group.bastion.id]
   associate_public_ip_address = true
 
@@ -43,7 +43,7 @@ resource "aws_instance" "bastion" {
 resource "aws_security_group" "private_instances" {
   name        = "private-instances-sg"
   description = "Security group for private instances"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description     = "SSH from bastion"
