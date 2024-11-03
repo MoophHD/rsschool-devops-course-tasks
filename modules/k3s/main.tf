@@ -2,13 +2,13 @@
 resource "aws_security_group" "k3s" {
   name        = "k3s-cluster-sg"
   description = "Security group for K3s cluster"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = [var.vpd_cidr_block]
   }
 
   // allow everyvthing from the bastion host
@@ -16,7 +16,7 @@ resource "aws_security_group" "k3s" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.bastion.id]
+    security_groups = [var.bastion_sg_id]
   }
 
   // allow everything from the same security group
@@ -65,7 +65,7 @@ resource "aws_instance" "k3s_server" {
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.k3s.id]
-  subnet_id              = aws_subnet.private[0].id
+  subnet_id              = var.private_subnet_ids[0]
   iam_instance_profile   = aws_iam_instance_profile.k3s_profile.name
   key_name               = var.bastion_keypair_name
 
@@ -90,7 +90,7 @@ resource "aws_instance" "k3s_agent" {
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.k3s.id]
-  subnet_id              = aws_subnet.private[1].id
+  subnet_id              = var.private_subnet_ids[1]
   iam_instance_profile   = aws_iam_instance_profile.k3s_profile.name
   key_name               = var.bastion_keypair_name
 
